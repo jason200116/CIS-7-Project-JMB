@@ -1,0 +1,249 @@
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+
+void addEdge(vector<int> adj[], int u, int v) //from in-class
+{
+    adj[u].push_back(v);
+    adj[v].push_back(u);
+}
+
+void printGraph(vector<int> adj[], int V) //from in-class
+{
+    for (int v = 1; v < V; ++v)
+    {
+        cout << " The roads connected to (adjacent to) " << v << " are ";
+        for (auto x: adj[v])
+           cout << " -> " << x;
+        printf("\n");
+    }
+}
+
+
+
+
+struct Node {
+    int val, cost;
+    Node* next;
+};
+
+
+struct Edge {
+    int src, dest, weight;
+};
+
+
+
+class Graph // Graph object
+{
+ // Function to make Adjacency List / from HW assignment
+
+
+ Node* getAdjListNode(int value, int weight, Node* head)
+  {
+    Node* newNode = new Node;
+    newNode->val = value;
+    newNode->cost = weight;
+    newNode->next = head;
+
+   return newNode;
+  }
+
+  int N;  //nodes in the graph
+
+public:
+Node **head;
+
+ Graph(Edge edges[], int n, int N)
+ {
+   head = new Node*[N]();
+   this->N = N;
+
+   for (int i = 0; i < N; i++)
+   head[i] = nullptr;
+
+
+   for (int i = 0; i < n; i++)
+   {
+   int src = edges[i].src;
+   int dest = edges[i].dest;
+   int weight = edges[i].weight;
+   Node* newNode = getAdjListNode(dest, weight, head[src]);
+
+   head[src] = newNode;
+
+   // Makes the graph undirected
+   newNode = getAdjListNode(src, weight, head[dest]);
+   head[dest] = newNode;
+
+   }
+ }
+ Graph()
+ {
+   for (int i = 0; i < N; i++)
+     delete[] head[i];
+
+     delete[] head;
+ }
+};
+
+
+void printList(Node* ptr) //For Choice 1
+{
+    while (ptr != nullptr)
+    {
+        if(ptr->val != 1)
+        cout << " -> " << ptr->val << " ";
+        ptr = ptr->next;
+    }
+    cout << endl;
+}
+
+
+
+
+// print all neighboring vertices of given vertex // Choice 2/4
+void printList(Node* ptr, int i)
+{
+    while (ptr != nullptr)
+    {
+
+        cout << "(" << i << ", " << ptr->val
+            << ", " << ptr->cost << ") ";
+
+        ptr = ptr->next;
+    }
+
+    cout << endl;
+}
+
+
+
+
+
+
+
+
+int main()
+{
+    int choice = 0;
+
+    cout << "Hi , welcome to the Inland Empire Solar Sales Travel Program! " << endl;
+    cout << "Select one of the numbers from the options below! " << endl <<
+            "1. Variations of Trip (All possible trips) " << endl <<
+            "2. Shortest Path " << endl <<
+            "3. Roads (Adjancies) " << endl <<
+            "4. Map (Matrix)" << endl;
+    cin >> choice;
+
+    if(choice < 1 || choice > 4)//for bad input
+    {
+        cout << "The option you have chosen does not exist, please select another option 1-4." << endl;
+    }
+
+
+    if(choice == 1) //Trip repersentation
+    {
+        cout << "Possible Routes From Each City:"
+                "\n 1.Riverside 2.Hemet 3.Moreno Valley 4.Perris " << endl;
+
+
+        Edge edges[] =
+
+            {
+                // pair x, y
+                { 1, 2 }, { 1, 3 }, { 1, 4 }, { 3, 4 },
+                { 3, 2 }, { 4, 2 }
+            };
+
+            // Vertices
+            int N = 5;
+            int n = sizeof(edges)/sizeof(edges[0]);
+            Graph graph(edges, n, N);
+            for (int i = 1; i < N; i++)
+            {
+                cout << i;
+                printList(graph.head[i]);
+            }
+            cin >> choice;
+
+
+
+
+    }//end of choice 1
+
+    if(choice == 2) //shortest path / lowest cost
+    {
+        cout << "Locations:\n1.Riverside 2.Hemet 3.Moreno Valley 4.Perris" << endl;
+        cout << "Based on the Matrice generated from the graph" << endl;
+
+                Edge edges[] =
+                    {
+                        // (1st Vertice, 2nd Vertice , weight (value))
+                        { 1, 2, 33 }, { 1, 3, 16 }, { 1, 4, 24 }, { 2, 3, 26 },
+                        { 3, 4, 18 }, { 4, 2, 30 }
+                    };
+                int numOfVertices = 5;
+
+                int n = sizeof(edges)/sizeof(edges[0]);
+
+                Graph graph(edges, n , numOfVertices);
+
+                for(int i = 1; i < numOfVertices; i++)
+                {
+                    printList(graph.head[i] , i);
+                }
+        cout << "\nThe matrice displays ,along with the trip repersentation from choice 1 , a potential of\n"
+                "6 routes that can be utilized for the trip." << endl;
+        cout << "(1,2,3,4) = 77 \n(1,2,4,3) = 81 \n(1,4,2,3) = 80\n(1,4,3,2) = 68" << endl;
+        cout << "(1,3,2,4) = 72\nWith the shortest path/lowest cost path being (1,3,4,2) = 64 miles";
+
+    }//end of choice 2
+
+    if(choice == 3) // Adjancies
+    {
+        int v = 5;
+        vector <int> arr[v];
+        addEdge(arr, 1, 2);
+        addEdge(arr, 1, 3);
+        addEdge(arr, 1, 4);
+        addEdge(arr, 3, 4);
+        addEdge(arr, 3, 2);
+        addEdge(arr, 4, 2);
+
+        printGraph(arr, v);
+
+        cin >> choice;
+    } // end of choice 3
+
+    if(choice == 4) //Matrix with weight inclu.
+    {
+        cout << "Cities: 1.Riverside 2.Hemet 3.Moreno Valley 4.Perris" << endl;
+        cout << "Here is the following Matrix with the included weights." << endl;
+
+        Edge edges[] =
+            {
+                // (1st Vertice, 2nd Vertice , weight (value))
+                { 1, 2, 33 }, { 1, 3, 16 }, { 1, 4, 24 }, { 2, 3, 26 },
+                { 3, 4, 18 }, { 4, 2, 30 }
+            };
+        int numOfVertices = 5;
+
+        int n = sizeof(edges)/sizeof(edges[0]);
+
+        Graph graph(edges, n , numOfVertices);
+
+        for(int i = 1; i < numOfVertices; i++)
+        {
+            printList(graph.head[i] , i);
+        }
+
+        cin >> choice; // to chose other choices
+
+    }//end of choice 4
+
+
+
+    return 0;
+}//end of main
